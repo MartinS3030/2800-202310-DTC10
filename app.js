@@ -129,8 +129,14 @@ app.post('/loginSubmit', async (req, res) => {
     }
 })
 
+
+
 app.get('/profile', (req, res) => {
     res.render('profile', { stylesheetPath: '/path/to/stylesheet.css' })
+})
+
+app.post('/loginSubmit', async (req, res) => {
+
 })
 
 module.exports = app
