@@ -8,8 +8,12 @@ const userSchema = new mongoose.Schema({
     wishlist: Array,
     favourites: Array,
     history: Array,
-    dob: String
-})
+    dob: String,
+    profilePicture: {
+      filename: String,
+      path: String,
+    }
+  });
 
 const User = mongoose.model('users', userSchema)
 
