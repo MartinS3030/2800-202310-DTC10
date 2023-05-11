@@ -1,12 +1,17 @@
-const express = require('express')
-const session = require('express-session')
-const MongoStore = require('connect-mongo')
-const userModel = require('./models/user')
-const bcrypt = require('bcrypt')
-const joi = require('joi')
-const app = express()
+const express = require('express');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const userModel = require('./models/user');
+const bcrypt = require('bcrypt');
+const joi = require('joi');
+const { PassThrough } = require('stream');
+const app = express();
+const B2 = require('backblaze-b2');
+const fs = require('fs');
+const multer = require('multer');
+const { profile } = require('console');
 require('dotenv').config();
-require("./utils.js");
+require('./utils.js');
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static('public'));
@@ -19,16 +24,37 @@ const mongodb_password = process.env.MONGODB_PASSWORD;
 const mongodb_database = process.env.MONGODB_DATABASE;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 const node_session_secret = process.env.NODE_SESSION_SECRET;
+backblaze_account = process.env.BACKBLAZE_ACCOUNT_ID;
+backblaze_API = process.env.BACKBLAZE_APPLICATION_KEY;
+backblaze_bucket = process.env.BACKBLAZE_BUCKET_ID;
 
 var {
     database
 } = include('databaseConnection');
 
 const userCollection = database.db(mongodb_database).collection('users');
+const multerStorage = multer.memoryStorage();
+const upload = multer({ storage: multerStorage });
 
 app.use(express.urlencoded({
     extended: false
 }));
+
+const b2 = new B2({
+    applicationKeyId: backblaze_account,
+    applicationKey: backblaze_API
+  });
+
+  async function GetBucket() {
+    try {
+      await b2.authorize(); // must authorize first (authorization lasts 24 hrs)
+      let response = await b2.getBucket({ bucketName: backblaze_bucket });
+      console.log(response.data);
+      console.log("success")
+    } catch (err) {
+      console.log('Error getting bucket:', err);
+    }
+  }
 
 var mongoStore = MongoStore.create({
     mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`,
@@ -134,8 +160,41 @@ app.get('/profile', async (req, res) => {
     const username = result[0].username;
     const name = result[0].name;
     const dob = result[0].dob;
-    res.render('profile', { username: username, name: name, email: email, dob: dob, stylesheetPath: './styles/profile.css' })
+    const profilePicture = result[0].profilePicture;
+    res.render('profile', { profileImageId: profilePicture,
+        backblazeBucketName: process.env.BACKBLAZE_BUCKET_NAME, username: username, name: name, email: email, dob: dob, stylesheetPath: './styles/profile.css' })
 })
+
+app.post('/uploadPhoto', upload.single('profileImage'), async (req, res) => {
+    console.log('starting upload');
+    
+    // Check if a file was uploaded
+    if (req.file) {
+      const profileImage = req.file;
+      console.log(profileImage.originalname)
+      console.log('File Buffer:', profileImage.buffer);
+      
+      // Authenticate with Backblaze B2
+      await b2.authorize();
+      console.log('authorized');
+      
+      // Upload the file buffer to Backblaze B2
+      const fileInfo = await b2.uploadFile(profileImage.buffer, {
+        fileName: profileImage.originalname,
+        bucketId: backblaze_bucket,
+      });
+      console.log('uploaded');
+      
+      // Get the uploaded file's ID from Backblaze B2
+      const imageId = fileInfo.fileId;
+      
+      // Store the image ID in the user collection in MongoDB
+      await userModel.updateOne(
+        { email: req.session.email },
+        { $set: { profileImageId: imageId } }
+      );
+    }
+  });
 
 app.post('/updateInfo', async (req, res) => {
     // Retrieve the user's session name

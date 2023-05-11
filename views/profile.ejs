@@ -27,12 +27,26 @@
                         <div class="card-header">Profile Picture</div>
                         <div class="card-body text-center">
                             <!-- Profile picture image-->
+                            <% if (profileImageId) { %>
+                                <img class="img-account-profile rounded-circle mb-2"
+                                     src="https://<%= backblazeBucketName %>.s3.us-west-2.amazonaws.com/<%= profileImageId %>"
+                                     alt="Profile Picture">
+                              <% } else { %>
+                                <img class="img-account-profile rounded-circle mb-2"
+                                src="https://t4.ftcdn.net/jpg/05/09/59/75/360_F_509597532_RKUuYsERhODmkxkZd82pSHnFtDAtgbzJ.jpg" alt="Default Profile Picture">
+                              <% } %>
+                              
                             <img class="img-account-profile rounded-circle mb-2"
                                 src="https://t4.ftcdn.net/jpg/05/09/59/75/360_F_509597532_RKUuYsERhODmkxkZd82pSHnFtDAtgbzJ.jpg" alt="">
                             <!-- Profile picture help block-->
                             <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
                             <!-- Profile picture upload button-->
-                            <button class="btn btn-primary" type="button">Upload new image</button>
+                            <form action="/uploadPhoto" method="POST" enctype="multipart/form-data">
+                                <div>
+                                    <input type="file" name="profileImage" accept="image/jpeg, image/png">
+                                    <button class="btn btn-primary" type="submit">Upload new image</button>
+                                </div>
+                            </form>
                         </div>
             <div class="wizard">
                 <!-- Wizard for different pages -->

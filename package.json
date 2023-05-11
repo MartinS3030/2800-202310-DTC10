@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "b2": "^0.1.11",
+    "backblaze": "^2.3.0",
     "bcrypt": "^5.1.0",
     "connect-mongo": "^5.0.0",
     "connect-mongodb-session": "^3.1.1",
@@ -8,6 +10,8 @@
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "joi": "^17.9.2",
-    "mongoose": "^7.1.0"
+    "mongoose": "^7.1.0",
+    "multer": "^1.4.5-lts.1",
+    "stream": "^0.0.2"
   }
 }
