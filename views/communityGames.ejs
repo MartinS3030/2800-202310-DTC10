@@ -1,0 +1,11 @@
+<%- include("templates/head", { stylesheetPath: ['/styles/communityGames.css', '/styles/gameSearchbar.css', '/styles/nav.css','/styles/foot.css'] }) %> 
+
+<%-include("templates/nav") %>
+
+<script src="/scripts/gameSearchbar.js"></script>
+<h1>Search for a community</h1>
+<form autocomplete="off" action="/gamePage" method="get">
+    <%- include ("templates/gameSearchbar") %>
+</form>
+
+<%- include("templates/foot") %>
