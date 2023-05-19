@@ -605,6 +605,15 @@ app.get('/optionProcess', userAuthenticator, async (req, res) => {
     res.redirect(`/recommender`);
 });
 
+app.get('/communityGames', userAuthenticator, async (req, res) => {
+    res.render('communityGames', { stylesheetPath: ['./styles/communityGames.css'] })
+})
+
+app.get('/gamePage', userAuthenticator, async (req, res) => {
+    const game = req.query.game;
+    res.render('gamePage', { game: game, stylesheetPath: ['./styles/game.css'] })
+})
+
 app.get("*", (req, res) => {
     res.status(404);
     res.render("404");
