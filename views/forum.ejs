@@ -1,0 +1,64 @@
+<%- include("templates/head", { stylesheetPath:['/styles/profile.css','/styles/nav.css','/styles/foot.css'] }) %>
+<%- include("templates/nav") %>
+<div class="profile-container mt-5 .col-xs">
+    <div class="row">
+        <div class="col-lg-4 pb-5">
+            <!-- Account Sidebar-->
+            <div class="card mb-4 mb-xl-0">
+                <div class="wizard">
+                    <!-- Wizard for different pages -->
+                    <nav class="list-group list-group-flush mb-0">
+                        <a class="list-group-item" href="/profile">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="d-inline-block font-weight-medium text-uppercase">Ratings and Reviews
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <a class="list-group-item" href="/wishlist">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="d-inline-block font-weight-medium text-uppercase">Art and Videos</div>
+                                </div>
+                            </div>
+                        </a>
+                        <a class="list-group-item" href="/favourites">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="d-inline-block font-weight-medium text-uppercase">Team Finder
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 pb-5">
+            <div class="d-flex flex-wrap justify-content- align-items-center">
+                <button class="btn btn-style-1 btn-outline-warning" type="submit"
+                onclick="window.location.href='/updateInfo';" id="updateProfileButton">+Add New Post</button>
+            </div>
+            <div class="inner-main-body p-2 p-sm-3 collapse forum-content show">
+                <div class="card mb-2">
+                    <div class="media d-flex forum-item p-2 p-sm-3">
+                        <div class="col-8"> <!-- Use col-8 class for 60% width -->
+                            <div class="text">
+                                <p>Username</p>
+                                <h1>Title</h1>
+                            </div>
+                        </div>
+                        <div class="col-4"> <!-- Use col-4 class for 40% width -->
+                            <div class="image">
+                                <a href="#" data-toggle="collapse" data-target=".forum-content">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="mr-3 rounded-circle" width="50" alt="User" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+<%- include("templates/foot") %>

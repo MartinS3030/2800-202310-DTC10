@@ -829,6 +829,11 @@ app.get("/optionProcess", userAuthenticator, async (req, res) => {
   res.redirect(`/recommender`);
 });
 
+
+app.get("/forum", userAuthenticator, async (req, res) => {
+  res.render("forum", {stylesheetPath: ["./styles/profile.css"]});
+});
+
 app.get("*", (req, res) => {
   res.status(404);
   res.render("404");
