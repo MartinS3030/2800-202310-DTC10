@@ -129,3 +129,7 @@ background-color: #d8c690;
                     width: 100%;          
                 }
 }
+
+.modal-content {
+    background-color: #292929;
+}

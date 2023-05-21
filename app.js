@@ -36,6 +36,7 @@ backblaze_name = process.env.BACKBLAZE_BUCKET_NAME;
 var { database } = include("databaseConnection");
 
 const userCollection = database.db(mongodb_database).collection("users");
+const forumCollection = database.db(mongodb_database).collection('forum');
 
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -353,9 +354,7 @@ app.get("/profile", userAuthenticator, async (req, res) => {
   }
 });
 
-app.post(
-  "/saveImage",
-  userAuthenticator,
+app.post("/saveImage", userAuthenticator,
   upload.single("profilePic"),
   async (req, res) => {
     const email = req.session.email;
@@ -414,19 +413,6 @@ app.post(
       const user = await userModel.findOne({ email });
       const currentProfilePic = user.profilePic;
       console.log("Photo retrieved from database")
-
-      // Check if the current profile picture file path exists and is different from the new file path
-      // if (currentProfilePic && currentProfilePic !== `/${fileName}`) {
-      //   // Extract the file name from the current profile picture file path
-      //   const currentFileName = currentProfilePic.substring(1);
-
-      //   // Delete the old profile picture file from Backblaze B2
-      //   // await b2.deleteFileVersion({
-      //   //   bucketId: backblaze_bucket,
-      //   //   fileName: currentFileName,
-      //   // });
-      //   // console.log("Old profile picture file deleted:", currentFileName);
-      // }
 
       // Update the user's profilePic field in the database with the new file path
       await userCollection.updateOne(
@@ -832,6 +818,83 @@ app.get("/optionProcess", userAuthenticator, async (req, res) => {
 
 app.get("/forum", userAuthenticator, async (req, res) => {
   res.render("forum", {stylesheetPath: ["./styles/profile.css"]});
+});
+
+app.post("/savePost", userAuthenticator, upload.single("forumPost"), async (req, res) => {
+//   const email = req.session.email;
+
+  // Configure your Backblaze B2 settings
+  const b2 = new B2({
+    applicationKeyId: backblaze_account,
+    applicationKey: backblaze_API,
+  });
+
+  try {
+    // Authorize with Backblaze B2
+    await b2.authorize();
+
+    // Get the bucket information
+    let response = await b2.getBucket({ bucketName: backblaze_name });
+
+    // Read the uploaded image file from the saved path on the file system
+    const fileData = fs.readFileSync(req.file.path);
+
+    // Calculate the SHA1 hash of the file content
+    const contentSha1 = crypto
+      .createHash("sha1")
+      .update(fileData)
+      .digest("hex");
+
+    // Define the folder name as the user's ID
+    const folderName = "forum";
+
+    const fileExtension = req.file.mimetype.split('/')[1]; // Extract the file extension from the MIME type
+
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const fileName = `${folderName}/Post-${uniqueSuffix}.${fileExtension}`;
+    console.log(fileName);  
+
+    // Get the upload URL and authorization token
+    const uploadUrlResponse = await b2.getUploadUrl({
+      bucketId: backblaze_bucket,
+    });
+    const uploadUrl = uploadUrlResponse.data.uploadUrl;
+    const uploadAuthToken = uploadUrlResponse.data.authorizationToken;
+
+    // Upload the file to Backblaze B2
+    await b2.uploadFile({
+      uploadUrl: uploadUrl,
+      uploadAuthToken: uploadAuthToken,
+      fileName: fileName,
+      data: fileData,
+      bucketName: backblaze_name,
+      contentSha1: contentSha1,
+    });
+    console.log("File uploaded successfully:", fileName);
+
+    // Delete the uploaded file from the local filesystem
+    fs.unlinkSync(req.file.path);
+    console.log("File deleted locally")
+
+//     // Retrieve the current profile picture file path from the user document
+//     const user = await userModel.findOne({ email });
+//     const currentProfilePic = user.profilePic;
+//     console.log("Photo retrieved from database")
+
+//     // Update the user's profilePic field in the database with the new file path
+//     await userCollection.updateOne(
+//       { email },
+//       { $set: { profilePic: `/${fileName}` } }
+//     );
+//     console.log("Photo path updated in database") 
+
+    // Redirect to the profile page or display a success message
+    res.redirect("/profile");
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    // Handle the error accordingly
+    // res.redirect('/profile'); // Redirect to the profile page or display an error message
+  }
 });
 
 app.get("*", (req, res) => {

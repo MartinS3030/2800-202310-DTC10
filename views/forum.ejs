@@ -37,8 +37,7 @@
         </div>
         <div class="col-lg-8 pb-5">
             <div class="d-flex flex-wrap justify-content- align-items-center">
-                <button class="btn btn-style-1 btn-outline-warning" type="submit"
-                onclick="window.location.href='/updateInfo';" id="updateProfileButton">+Add New Post</button>
+                <button class="btn btn-style-1 btn-outline-warning" data-bs-toggle="modal" data-bs-target="#exampleModalLong" id="New Post">+Add New Post</button>
             </div>
             <div class="inner-main-body p-2 p-sm-3 collapse forum-content show">
                 <div class="card mb-2">
@@ -61,4 +60,33 @@
         </div>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Add New Post</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <form action="/updateInfo" method="post">
+                <div class="row">
+                  <div class="form-group">
+                    <label for="account-fn">Post Title</label>
+                    <input class="form-control" type="text" name="name" value="" required="">
+                  </div>
+                </div>
+        </div>
+        <form action="/savePost" method="POST" enctype="multipart/form-data">
+            <input type="file" name="forumPost" id="forumPost" accept="image/*, video/*">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-dark">Create Post</button>
+            </div>
+        </form>        
+      </div>
+    </div>
+  </div>
 <%- include("templates/foot") %>
