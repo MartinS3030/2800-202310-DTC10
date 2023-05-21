@@ -16,6 +16,7 @@ const fs = require("fs");
 const multer = require("multer");
 const { PassThrough } = require("stream");
 const { profile } = require("console");
+const { ObjectId } = require('mongodb');
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static("public"));
@@ -817,11 +818,18 @@ app.get("/optionProcess", userAuthenticator, async (req, res) => {
 
 
 app.get("/forum", userAuthenticator, async (req, res) => {
-  res.render("forum", {stylesheetPath: ["./styles/profile.css"]});
+  console.log("checkpoint 1")
+  await forumCollection.find().toArray((err, result) => {
+    if (err) throw err;
+
+    console.log(result);
+
+    res.render("forum", { forumPosts: result, stylesheetPath: ["./styles/profile.css"] });
+  });
 });
 
 app.post("/savePost", userAuthenticator, upload.single("forumPost"), async (req, res) => {
-//   const email = req.session.email;
+  const email = req.session.email;
 
   // Configure your Backblaze B2 settings
   const b2 = new B2({
@@ -876,24 +884,24 @@ app.post("/savePost", userAuthenticator, upload.single("forumPost"), async (req,
     fs.unlinkSync(req.file.path);
     console.log("File deleted locally")
 
-//     // Retrieve the current profile picture file path from the user document
-//     const user = await userModel.findOne({ email });
-//     const currentProfilePic = user.profilePic;
-//     console.log("Photo retrieved from database")
+    const postId = new ObjectId().toString();
+    const post = {
+      postId: postId,
+      userEmail: email,
+      postFile: `/${fileName}`,
+      postText: req.body.title,
+    }
 
-//     // Update the user's profilePic field in the database with the new file path
-//     await userCollection.updateOne(
-//       { email },
-//       { $set: { profilePic: `/${fileName}` } }
-//     );
-//     console.log("Photo path updated in database") 
+    // Retrieve the current profile picture file path from the user document
+    await forumCollection.insertOne(post);
+    console.log("Post saved to database")
 
     // Redirect to the profile page or display a success message
-    res.redirect("/profile");
+    res.redirect("/forum");
   } catch (error) {
     console.error("Error uploading image:", error);
     // Handle the error accordingly
-    // res.redirect('/profile'); // Redirect to the profile page or display an error message
+    res.redirect('/profile'); // Redirect to the profile page or display an error message
   }
 });
 

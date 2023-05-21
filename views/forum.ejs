@@ -40,12 +40,13 @@
                 <button class="btn btn-style-1 btn-outline-warning" data-bs-toggle="modal" data-bs-target="#exampleModalLong" id="New Post">+Add New Post</button>
             </div>
             <div class="inner-main-body p-2 p-sm-3 collapse forum-content show">
+                <% forumPosts.forEach(function(post) { %>
                 <div class="card mb-2">
                     <div class="media d-flex forum-item p-2 p-sm-3">
                         <div class="col-8"> <!-- Use col-8 class for 60% width -->
                             <div class="text">
-                                <p>Username</p>
-                                <h1>Title</h1>
+                                <p><%= post.username %></p>
+                                <h1><%= post.title %></h1>
                             </div>
                         </div>
                         <div class="col-4"> <!-- Use col-4 class for 40% width -->
@@ -57,6 +58,8 @@
                         </div>
                     </div>
                 </div>
+                <% }); %>
+            </div>
         </div>
     </div>
 </div>
@@ -70,16 +73,15 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
+        <form action="/savePost" method="POST" enctype="multipart/form-data">
         <div class="modal-body">
-            <form action="/updateInfo" method="post">
                 <div class="row">
                   <div class="form-group">
                     <label for="account-fn">Post Title</label>
-                    <input class="form-control" type="text" name="name" value="" required="">
+                    <input class="form-control" type="text" name="title" value="" required="">
                   </div>
                 </div>
         </div>
-        <form action="/savePost" method="POST" enctype="multipart/form-data">
             <input type="file" name="forumPost" id="forumPost" accept="image/*, video/*">
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
