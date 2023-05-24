@@ -4,6 +4,16 @@
   <div class="row">
     <%- include("templates/profile_picture") %>
     <!-- Profile Settings-->
+    <% if ( gamingPlatform === null) { %>
+      <% platform = "Select your platform" %>
+    <% } else { %>
+      <% platform = gamingPlatform %>
+    <% } %>
+    <% if (gamingId === null) { %>
+      <% id = "Enter your ID" %>
+    <% } else { %>
+      <% id = gamingId %>
+    <% } %>
     <div class="col-lg-8 pb-5">
       <form class="row" action="/updateInfo" method="post">
         <div class="col-md-6">
@@ -46,36 +56,18 @@
         </div>
         <div class="col-md-6">
           <div class="form-group">
-            <label for="securityQuestion">Security Question?</label>
-            <select class="form-control mb-4" name="security_question">
-              <option value="Where was your mother born?">Where was your mother born?</option>
-              <option value="What was your first car?">What was your first car?</option>
-              <option value="What was the first name of your first pet?">What was the first name of your first pet?</option>
-              <option value="What was your school name?">What was your school name?</option>
-              <option value="Where were you born?">Where were you born?</option>
-              <option value="What model your first smartphone was?">What model your first smartphone was?</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="form-group">
-            <label for="secQuestAnswer">Security Question Answer</label>
-            <input type="text" class="form-control" name="security_answer" placeholder="Answer here">
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="form-group">
             <label class="pr-10" for="secQuestAnswer">Gaming ID</label>
             <select class="form-control mb-4" name="gaming_platform">
-              <option value="Discord">Discord</option>
-              <option value="Steam">Steam</option>
-              <option value="Nintendo Switch">Nintendo Switch</option>
-              <option value="Playstation">Playstation</option>
-              <option value="Xbox">Xbox</option>
+              <option value=""></option>
+              <option value="Discord" <% if (platform === 'Discord') { %>selected<% } %>>Discord</option>
+              <option value="Steam" <% if (platform === 'Steam') { %>selected<% } %>>Steam</option>
+              <option value="Nintendo Switch" <% if (platform === 'Nintendo Switch') { %>selected<% } %>>Nintendo Switch</option>
+              <option value="Playstation" <% if (platform === 'Playstation') { %>selected<% } %>>Playstation</option>
+              <option value="Xbox" <% if (platform === 'Xbox') { %>selected<% } %>>Xbox</option>
             </select>
-            <input type="text" class="form-control" name="gaming_id" placeholder="Gaming ID">
+            <input type="text" class="form-control" name="gaming_id" value="<%= id %>">
           </div>
-        </div>
+        </div>        
         <div class="col-12">
           <hr class="mt-2 mb-3" style="border: 0px">
           <div class="d-flex flex-wrap justify-content-between align-items-center">

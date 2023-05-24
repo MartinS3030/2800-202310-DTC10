@@ -336,6 +336,8 @@ app.get("/profile", userAuthenticator, async (req, res) => {
   const name = result[0].name;
   const dob = result[0].dob;
   const profilePic = result[0].profilePic;
+  const gamingId = result[0].gamingId;
+  const gamingPlatform = result[0].gamingPlatform;
 
   let profilePicUrl = null;
   if (profilePic) {
@@ -347,6 +349,8 @@ app.get("/profile", userAuthenticator, async (req, res) => {
     name,
     email,
     dob,
+    gamingId,
+    gamingPlatform,
     profilePic: profilePicUrl,
     stylesheetPath: "./styles/profile.css",
   });
@@ -458,6 +462,8 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
   const updatedDob = req.body.dob;
   const newPassword = req.body.newPassword;
   const confirmPassword = req.body.confirmPassword;
+  const gamingPlatform = req.body.gaming_platform;
+  const gamingId = req.body.gaming_id;
   console.log(updatedName);
 
   // Fetch the user document from the database
@@ -507,7 +513,34 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
       );
     }
 
+    if (gamingId !== user.gamingId) {
+      await userCollection.updateOne(
+        {
+          email: email,
+        },
+        {
+          $set: {
+            gamingId: gamingId,
+          },
+        }
+      );
+    }
+
+    if (gamingPlatform !== user.gamingPlatform) {
+      await userCollection.updateOne(
+        {
+          email: email,
+        },
+        {
+          $set: {
+            gamingPlatform: gamingPlatform,
+          },
+        }
+      );
+    }
+
     if (
+      newPassword !== '' && // Check if newPassword has a value
       !bcrypt.compareSync(newPassword, user.password) &&
       newPassword === confirmPassword
     ) {
@@ -522,6 +555,7 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
         }
       );
     }
+    
 
     // Redirect or respond with a success message
     return res.redirect("/profile");
